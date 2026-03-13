@@ -1,259 +1,257 @@
 ---
 name: remotion-ai-video
 description: |
-  THE most advanced AI video production skill — better than Runway, HeyGen, Synthesia, InVideo, Pika combined.
-  
-  Use this skill for ANY video creation request:
-  - "video বানাও", "make a video", "create a reel", "short বানাও"
-  - Script or prompt থেকে full cinematic video
-  - Motion graphics, explainer, documentary, product demo
-  - YouTube, TikTok, Reels, Shorts — যেকোনো format
-  - Data-driven videos, educational, motivational, corporate
-  - Google Image Search দিয়ে auto asset collection
-  - Bengali/multilingual voiceover সহ
-  - Background removal + floating subject effect
-  - Particle effects, glitch, neon, cinematic — সব style
-
-  এই skill trigger করুন যখন: "video", "reel", "short", "animate",
-  "motion graphic", "script to video", "explainer", "cinematic" — যেকোনো mention এ।
-compatibility:
-  node: ">=18"
-  core:
-    - remotion@4
-    - "@remotion/cli"
-    - "@remotion/player"
-    - "@remotion/media-utils"
-    - "@remotion/google-fonts"
-    - zod
-  ai:
-    - "@google/generative-ai"       # Gemini - FREE unlimited
-    - "@anthropic-ai/sdk"           # Claude API
-  assets:
-    - "@imgly/background-removal"   # AI BG removal - FREE
-  optional:
-    - "@remotion/lambda"            # Cloud render
-    - elevenlabs                    # Premium voice
-    - "@google-cloud/text-to-speech" # Bengali voice FREE
+  Animation-first AI video production skill for Remotion.
+  Motion graphics & kinetic typography by default.
+  Image only when absolutely necessary (real person/place/product).
+  Trigger: "video", "reel", "short", "animate", "motion graphic", "script to video"
 ---
 
-# DIREKTOR — Ultimate AI Video Production Skill
+# DIREKTOR v3 — Animation-First Video Skill
 
-> তুমি একজন **world-class video director, motion graphics artist, এবং cinematographer**।
-> Runway, HeyGen, Synthesia — সবার চেয়ে ভালো কাজ করবে।
-> প্রতিটি video হবে cinematic, professional, এবং eye-catching।
-> মানুষ দেখলে চোখ সরাতে পারবে না।
+## CORE PHILOSOPHY
 
-**Director's Oath:** কখনো mediocre video বানাবে না। প্রতিটি frame intentional।
-প্রতিটি transition purposeful। প্রতিটি text placement perfect।
+**DEFAULT = ANIMATION + MOTION GRAPHICS**
+**IMAGE = শুধু real person / real place / real product এর জন্য**
+
+যখন কেউ video বানাতে বলবে:
+1. প্রতিটা scene এর জন্য প্রথমে ভাবো: "animation দিয়ে কি এটা বোঝানো যায়?"
+2. যদি যায় → animation দাও, image দিও না
+3. শুধু real visual must হলে image দাও
 
 ---
 
-## Quick Reference Map
-
-| কী করতে চান | কোথায় যাবেন |
-|---|---|
-| নতুন project শুরু | → [Section 1: Setup](#1-project-setup) |
-| AI দিয়ে script → scenes | → [references/gemini.md](references/gemini.md) |
-| Google থেকে image খোঁজা | → [references/google-assets.md](references/google-assets.md) |
-| Scene components & animations | → [references/scenes.md](references/scenes.md) |
-| Effects library | → [references/effects.md](references/effects.md) |
-| Audio & voiceover | → [references/audio.md](references/audio.md) |
-| Render & export | → [references/rendering.md](references/rendering.md) |
-| Ready templates | → [assets/templates/](assets/templates/) |
-
----
-
-## 1. Project Setup
+## PROJECT SETUP
 
 ```bash
-npx create-video@latest my-video --template blank
+npx create-remotion-app@latest my-video
 cd my-video
-npm install @remotion/google-fonts @imgly/background-removal zod @google/generative-ai
-```
-
-### Folder Structure
-```
-my-video/src/
-├── Root.tsx                    # সব composition register
-├── compositions/
-│   ├── CinematicVideo.tsx      # Main cinematic video
-│   ├── MotionGraphic.tsx       # Motion graphics only
-│   ├── SocialReel.tsx          # TikTok/Reels 9:16
-│   └── DataVideo.tsx           # Data-driven stats video
-├── components/
-│   ├── BaseScene.tsx           # Base scene (BG + overlay + grain)
-│   ├── AnimatedText.tsx        # All text animations
-│   ├── Transitions.tsx         # Scene transitions
-│   ├── Effects.tsx             # Neon, glitch, particles
-│   ├── BGRemoved.tsx           # Floating subject component
-│   ├── MotionGraphics.tsx      # Counters, bars, shapes
-│   └── Captions.tsx            # Auto subtitles
-├── pipeline/
-│   ├── gemini.ts               # Gemini AI brain
-│   ├── google-search.ts        # Google image search (Serper)
-│   ├── bgremove.ts             # Background removal
-│   └── voiceover.ts            # TTS pipeline
-└── types.ts
+npm install @remotion/player
 ```
 
 ---
 
-## 2. THE AI PIPELINE — Prompt → Professional Video
+## MAIN COMPOSITION
 
-এটাই আমাদের secret weapon। অন্য কোনো tool এটা এভাবে করে না।
+```tsx
+// src/Root.tsx
+import { Composition } from "remotion";
+import { VideoComposition } from "./VideoComposition";
+import scenes from "./scenes.json";
 
-```
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-STEP 1 ▸ USER PROMPT
-         "60s motivational video about success"
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-         ↓
-STEP 2 ▸ GEMINI AI BRAIN
-         • Script লেখে (hook + body + CTA)
-         • ৫-৮টা scene এ ভাগ করে
-         • প্রতি scene এর জন্য:
-           - Headline, subtext, voiceover
-           - Google search query (specific!)
-           - Color grade, effect, transition
-           - BG remove দরকার কিনা
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-         ↓
-STEP 3 ▸ GOOGLE IMAGE SEARCH (Serper API)
-         • প্রতি scene এর জন্য Google এ search
-         • Best HD image URL নিয়ে আসে
-         • Fallback: Unsplash → Pexels
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-         ↓
-STEP 4 ▸ BACKGROUND REMOVAL (AI)
-         • Subject আলাদা করে
-         • Transparent PNG বানায়
-         • Floating effect এর জন্য ready
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-         ↓
-STEP 5 ▸ REMOTION COMPOSITION
-         • Ken Burns effect (image zoom/pan)
-         • Cinematic color grading
-         • Animated text (fadeUp/reveal/typewriter)
-         • Smooth transitions
-         • Motion graphics overlay
-         • Particle effects
-         • Cinematic letterbox bars
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-         ↓
-STEP 6 ▸ VOICEOVER + AUDIO
-         • Google TTS (Bengali FREE)
-         • ElevenLabs (premium)
-         • Background music
-         • Audio ducking during voice
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-         ↓
-STEP 7 ▸ RENDER → MP4
-         • Platform-specific format
-         • YouTube / TikTok / Reels ready
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+export const RemotionRoot = () => (
+  <Composition
+    id="MainVideo"
+    component={VideoComposition}
+    durationInFrames={scenes.reduce((a, s) => a + s.duration * 30, 0)}
+    fps={30}
+    width={1080}
+    height={1920}
+    defaultProps={{ scenes }}
+  />
+);
 ```
 
----
+```tsx
+// src/VideoComposition.tsx
+import { AbsoluteFill, Series } from "remotion";
+import { SceneRouter } from "./scenes/SceneRouter";
 
-## 3. কেন এটা সবার চেয়ে Better?
-
-| Feature | Runway | HeyGen | Synthesia | InVideo | **এই Skill** |
-|---|---|---|---|---|---|
-| Script → Video | ✅ | ✅ | ✅ | ✅ | ✅ |
-| Google Image Search | ❌ | ❌ | ❌ | ❌ | ✅ |
-| BG Remove + Float | ❌ | ✅ | ❌ | ❌ | ✅ |
-| Bengali Voice | ❌ | limited | ❌ | ❌ | ✅ FREE |
-| Motion Graphics Code | ❌ | ❌ | ❌ | ❌ | ✅ full |
-| Full Code Control | ❌ | ❌ | ❌ | ❌ | ✅ |
-| Offline Render | ❌ | ❌ | ❌ | ❌ | ✅ |
-| 100% Free Pipeline | ❌ | ❌ | ❌ | ❌ | ✅ |
-| Custom Effects | limited | ❌ | ❌ | limited | ✅ unlimited |
-| Particle Systems | ❌ | ❌ | ❌ | ❌ | ✅ |
-| Glitch / Neon / Retro | limited | ❌ | ❌ | ❌ | ✅ |
-| Data-Driven Video | ❌ | ❌ | ❌ | ❌ | ✅ |
-
----
-
-## 4. Video Style Catalog
-
-প্রতিটি style এর জন্য specific implementation আছে [references/effects.md](references/effects.md) এ।
-
+export const VideoComposition = ({ scenes }) => (
+  <AbsoluteFill style={{ background: "#000" }}>
+    <Series>
+      {scenes.map((scene, i) => (
+        <Series.Sequence key={i} durationInFrames={scene.duration * 30}>
+          <SceneRouter scene={scene} />
+        </Series.Sequence>
+      ))}
+    </Series>
+  </AbsoluteFill>
+);
 ```
-🎬 CINEMATIC      Film-grade · letterbox · color LUT · Ken Burns
-⚡ NEON/CYBER     Grid overlay · glow text · dark bg · RGB accent
-◻  MINIMAL        White space · elegant type · subtle motion
-📡 GLITCH         RGB split · scan lines · digital artifacts
-🌿 NATURE         Breathing scale · organic colors · soft light
-🏢 CORPORATE      Clean data · animated stats · professional type
-📼 RETRO/VHS      Grain · color bleed · vintage palette · noise
-🌑 DARK/MOODY     Deep blacks · dramatic shadows · slow reveal
-💫 PARTICLES      Floating particles · burst effects · trails
-🎭 DOCUMENTARY    Lower thirds · interview style · b-roll cuts
+
+```tsx
+// src/scenes/SceneRouter.tsx
+import { KineticTextScene }   from "./KineticTextScene";
+import { WordExplosionScene } from "./WordExplosionScene";
+import { ParticleFieldScene } from "./ParticleFieldScene";
+import { CounterRevealScene } from "./CounterRevealScene";
+import { GlitchBurstScene }   from "./GlitchBurstScene";
+import { SplitScreenScene }   from "./SplitScreenScene";
+import { NeonGlowScene }      from "./NeonGlowScene";
+import { LineDrawScene }      from "./LineDrawScene";
+import { ShapeMorphScene }    from "./ShapeMorphScene";
+import { ImageBgScene }       from "./ImageBgScene";
+
+export const SceneRouter = ({ scene }) => {
+  const map = {
+    KINETIC_TEXT:   <KineticTextScene   scene={scene} />,
+    WORD_EXPLOSION: <WordExplosionScene scene={scene} />,
+    PARTICLE_FIELD: <ParticleFieldScene scene={scene} />,
+    COUNTER_REVEAL: <CounterRevealScene scene={scene} />,
+    GLITCH_BURST:   <GlitchBurstScene   scene={scene} />,
+    SPLIT_SCREEN:   <SplitScreenScene   scene={scene} />,
+    NEON_GLOW:      <NeonGlowScene      scene={scene} />,
+    LINE_DRAW:      <LineDrawScene      scene={scene} />,
+    SHAPE_MORPH:    <ShapeMorphScene    scene={scene} />,
+    IMAGE_BG:       <ImageBgScene       scene={scene} />,
+  };
+  return map[scene.sceneType] ?? <KineticTextScene scene={scene} />;
+};
 ```
 
 ---
 
-## 5. Director's Quality Checklist
+## SCENE TYPE GUIDE
 
-প্রতিটি video বানানোর পর এটা check করো:
+```
+KINETIC_TEXT    → animated text + geometric/gradient bg
+                  কখন: motivational quote, bold statement, hook
 
-**Visuals**
-- [ ] প্রতিটি scene এ color grade আছে — raw footage acceptable নয়
-- [ ] Ken Burns effect আছে (static image = boring)
-- [ ] Vignette + grain আছে (cinematic feel)
-- [ ] Typography Google Fonts থেকে — system font নয়
-- [ ] Text safe zone মানা হয়েছে (10% padding)
+WORD_EXPLOSION  → একটা word পুরো screen ভরে EXPLODE করে
+                  কখন: শুরুতে hook, climax, CTA
 
-**Pacing**
-- [ ] Hook: প্রথম ৩ সেকেন্ড attention grab করে
-- [ ] Fast content: ৩-৫s per scene
-- [ ] Documentary: ৬-১০s per scene
-- [ ] শেষ scene এ strong CTA আছে
+PARTICLE_FIELD  → floating particles + text overlay
+                  কখন: dreamy, emotional, inspiring scene
 
-**Audio**
-- [ ] Background music আছে
-- [ ] Voiceover এর সময় music ducked (30% volume)
-- [ ] Hard audio cut নেই — fade in/out আছে
-- [ ] Captions/subtitles generate হয়েছে
+COUNTER_REVEAL  → animated number বড় হয়ে দেখায়
+                  কখন: statistic, achievement, social proof
 
-**Technical**
-- [ ] Target platform format সঠিক
-- [ ] Render settings optimize হয়েছে
-- [ ] Props schema Zod দিয়ে validate হয়েছে
+GLITCH_BURST    → RGB split glitch দিয়ে text burst
+                  কখন: shock moment, dramatic reveal
 
----
+SPLIT_SCREEN    → screen দুভাগ — contrast দেখাতে
+                  কখন: before/after, problem/solution
 
-## 6. Environment Setup
+NEON_GLOW       → dark bg + neon glowing text
+                  কখন: tech, gaming, energy feel
 
-```env
-# AI (Gemini FREE — unlimited flash model)
-GEMINI_API_KEY=get_free_at_aistudio.google.com
+LINE_DRAW       → lines draw হয়ে text তৈরি হয়
+                  কখন: elegant reveal, premium feel
 
-# Google Image Search (2500 FREE queries/month)
-SERPER_API_KEY=get_free_at_serper.dev
+SHAPE_MORPH     → shapes morph করে message বোঝায়
+                  কখন: transformation, change, growth
 
-# Voiceover (Bengali FREE)
-# Google Cloud TTS — bn-BD-Standard-A
-
-# Optional Premium
-ELEVENLABS_API_KEY=optional_premium_voice
-PEXELS_API_KEY=optional_fallback_images
-UNSPLASH_ACCESS_KEY=optional_fallback_images
+IMAGE_BG        → real image background
+                  কখন: ONLY real person/place/product
 ```
 
 ---
 
-## 7. One-Line Video Generation
+## IMAGE দেবে না — বদলে এটা দাও
 
-```bash
-# Install dependencies
-npm install
-
-# Generate from prompt — এটুকুই দরকার!
-npx ts-node scripts/generate.ts "your video prompt here"
-
-# With options
-npx ts-node scripts/generate.ts "motivational video" --style=cinematic --duration=60 --lang=bn --format=youtube
+```
+"success" বোঝাতে    → COUNTER_REVEAL বা WORD_EXPLOSION
+"hope" বোঝাতে       → PARTICLE_FIELD
+"change" বোঝাতে     → SHAPE_MORPH
+"energy" বোঝাতে     → NEON_GLOW
+"contrast" বোঝাতে   → SPLIT_SCREEN
+"dramatic feel"      → KINETIC_TEXT + pure-black bg
+"emotional moment"   → PARTICLE_FIELD + slow music
+"achievement"        → COUNTER_REVEAL + WORD_EXPLOSION
 ```
 
-সব detail এর জন্য reference files পড়ো।
+---
+
+## BACKGROUND OPTIONS
+
+```
+pure-black      → #000 — dramatic, cinematic
+pure-white      → #fff — minimal, clean
+dark-gradient   → গাঢ় থেকে গাঢ়, depth effect
+color-gradient  → 2 bold color flow
+geometric-grid  → subtle neon grid lines
+noise-grain     → animated grain texture
+radial-glow     → center থেকে glow ছড়ায়
+```
+
+---
+
+## PATTERN INTERRUPT (প্রতি ২-৩ সেকেন্ডে একটা হবেই)
+
+```
+WORD_POP        → key word হঠাৎ 3x বড় হয়ে ছোট হয়
+COLOR_FLASH     → 3 frame background color বদলায়
+PARTICLE_BURST  → particles explode করে
+GLITCH_HIT      → 6 frame RGB split
+ZOOM_PUNCH      → 1.0 → 1.15 zoom, তারপর normal
+LINE_SLASH      → diagonal line screen কাটে
+SHAKE           → 3px screen shake, 4 frame
+```
+
+---
+
+## OUTPUT JSON FORMAT
+
+```json
+[
+  {
+    "id": 1,
+    "startTime": "00:00",
+    "endTime": "00:03",
+    "duration": 3,
+    "voiceover": "exact spoken words",
+    "sceneType": "WORD_EXPLOSION",
+    "background": "pure-black",
+    "primaryText": "STOP",
+    "secondaryText": "তুমি কি সত্যিই চেষ্টা করেছিলে?",
+    "accentColor": "#ff3c3c",
+    "textAnimation": "scale-punch",
+    "transition": "glitch",
+    "patternInterrupts": ["COLOR_FLASH", "PARTICLE_BURST"],
+    "motionGraphic": null,
+    "musicMood": "dramatic",
+    "imageQuery": null
+  },
+  {
+    "id": 2,
+    "startTime": "00:03",
+    "endTime": "00:07",
+    "duration": 4,
+    "voiceover": "spoken words",
+    "sceneType": "COUNTER_REVEAL",
+    "background": "dark-gradient",
+    "primaryText": "97%",
+    "secondaryText": "মানুষ প্রথম চেষ্টায় হার মেনে নেয়",
+    "accentColor": "#f5c518",
+    "textAnimation": "count-up",
+    "transition": "zoom",
+    "patternInterrupts": ["ZOOM_PUNCH", "WORD_POP"],
+    "motionGraphic": { "type": "counter", "from": 0, "to": 97, "suffix": "%" },
+    "musicMood": "tense",
+    "imageQuery": null
+  },
+  {
+    "id": 3,
+    "startTime": "00:07",
+    "endTime": "00:12",
+    "duration": 5,
+    "voiceover": "spoken words",
+    "sceneType": "IMAGE_BG",
+    "background": "image",
+    "imageQuery": "lone person mountain top sunrise dramatic cinematic 4k",
+    "primaryText": "THEY KEPT GOING",
+    "secondaryText": "বাকি ৩% ইতিহাস লিখেছে",
+    "accentColor": "#ffffff",
+    "textAnimation": "reveal",
+    "transition": "fade",
+    "patternInterrupts": ["ZOOM_PUNCH"],
+    "motionGraphic": null,
+    "musicMood": "epic",
+    "note": "Image — real mountain/person visual দরকার"
+  }
+]
+```
+
+---
+
+## DIRECTOR RULE
+
+ভালো video এর ratio:
+```
+70%+ → animation scenes (KINETIC_TEXT, WORD_EXPLOSION, COUNTER_REVEAL...)
+30%  → IMAGE_BG (শুধু যেখানে real visual must)
+```
+
+→ Full component code: [references/components.md](references/components.md)
+→ Hook prompt generator: [HOOK_PROMPT.md](HOOK_PROMPT.md)
